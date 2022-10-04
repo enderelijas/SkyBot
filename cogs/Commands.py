@@ -1,12 +1,11 @@
 from discord.ext import commands
-from main import HYPIXEL_KEY
 from methods import check_verification, get_uuid
 
 class CommandClass(commands.Cog):
     def __init__(self, client):
         self.client = client
-        self.session = self.client.session
-        self.hypixel_key = self.client.hypixel_key
+        self.session = client.session
+        self.hypixel_key = client.hypixel_key
     
     @commands.command()
     async def ping(self, ctx):
@@ -14,9 +13,11 @@ class CommandClass(commands.Cog):
 
     @commands.command()
     async def verify(self, ctx, username):
+        session = self.session
+        author = f"{ctx.author}#{ctx.author.discriminator}"
         uuid = (await get_uuid(session, username))
-        verified = (await check_verification(session, ctx.author, username, HYPIXEL_KEY))
-
+        verified = (await check_verification(session, ctx.author, uuid, self.hypixel_key))
+        
         if (verified == True):
             await ctx.send("You have been verified!")
         else:

@@ -6,11 +6,13 @@ async def get_uuid(session, username):
         return uuid["id"]
 
 async def check_verification(session, author, uuid, key):
-    headers = {
-        "Authorization": key
-    }
-    async with session.get("https://api.hypixel.net/player?uuid={uuid}") as response:
-        linked_discord = response.json()['links']
-        if (linked_discord):
-            if (linked_discord == author):
+    async with session.get(f"https://api.hypixel.net/player?uuid={uuid}&key={key}") as response:
+        response_json = await response.json()
+        if (response_json['success'] == True):
+            linked_discord = response_json['player']['socialMedia']['links']['DISCORD']
+            if (str(author) == linked_discord):
                 return True
+            else:
+                return False
+        else:
+            return False
