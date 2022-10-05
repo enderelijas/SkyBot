@@ -22,3 +22,7 @@ class CommandClass(commands.Cog):
             await ctx.send("You have been verified!")
         else:
             await ctx.send("Something went wrong. Please try again later.")
+
+    @commands.command()
+    async def stop(self, client):
+        await client.disconnect()
