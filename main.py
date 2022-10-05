@@ -1,4 +1,4 @@
-import discord, os, aiohttp
+import discord, os, aiohttp, json
 from discord.ext import commands
 from dotenv import load_dotenv
 from cogs import Commands, Events
@@ -15,6 +15,21 @@ client.add_cog(Events.Events(client))
 
 @client.event
 async def on_ready():
+    try:
+        with open("data.json", 'r') as file:
+            count = file.json()['count']
+            client.count = count
+    except IOError:
+        print("File not found or damaged. Creating a new one.")
+
     print("Ready for events!")
+
+@client.event
+async def on_disconnect():
+    with open("data.json", 'w') as file:
+        count = Commands.CommandClass().get_count()
+        data = {"count": count}
+
+        file.write(json.dump(data))
 
 client.run(BOT_TOKEN)

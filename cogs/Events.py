@@ -1,10 +1,11 @@
-import discord
+import discord, json
 from discord.ext import commands
 from discord import Color
 
 class Events(commands.Cog):
     def __init__(self, client):
         self.client = client
+        self.count = self.client.count
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -17,3 +18,15 @@ class Events(commands.Cog):
         embed.set_footer(text= "Made by enderelijas#5225")
 
         await channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_message(message):
+        channel = message.channel
+        count = self.count
+
+        if (channel == "ENTER ID HERE"):
+            count += 1
+
+    def get_count(self):
+        return self.count
+        
