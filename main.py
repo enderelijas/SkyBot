@@ -10,26 +10,34 @@ HYPIXEL_KEY = os.getenv('HYPIXEL_KEY')
 client = commands.Bot(command_prefix="?", intents=discord.Intents().all())
 client.session = aiohttp.ClientSession()
 client.hypixel_key = HYPIXEL_KEY
-client.add_cog(Commands.CommandClass(client))
-client.add_cog(Events.Events(client))
+client.count = 0
+
+command_class = Commands.CommandClass(client)
+event_class = Events.Events(client)
+
+client.add_cog(command_class)
+client.add_cog(event_class)
 
 @client.event
 async def on_ready():
     try:
         with open("data.json", 'r') as file:
-            count = file.json()['count']
-            client.count = count
+            data = json.load(file)
+            client.count = data['count']
     except IOError:
         print("File not found or damaged. Creating a new one.")
+        with open("data.json", 'w') as file:
+            count = 0
+            data = {"count": count}
+
+            file.write(json.dumps(data))
 
     print("Ready for events!")
 
-@client.event
-async def on_disconnect():
-    with open("data.json", 'w') as file:
-        count = Commands.CommandClass().get_count()
-        data = {"count": count}
-
-        file.write(json.dump(data))
-
 client.run(BOT_TOKEN)
+
+with open("data.json", 'r+') as file:
+    count = event_class.get_count()
+    print(count)
+    data = json.load(file)
+    data['count'] = count
