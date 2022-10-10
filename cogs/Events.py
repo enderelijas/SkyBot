@@ -19,15 +19,15 @@ class Events(commands.Cog):
 
         await channel.send(embed=embed)
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        channel = message.channel
-        client = self.client
-        count = self.count
+    # @commands.Cog.listener()
+    # async def on_message(self, message):
+    #     channel = message.channel
+    #     client = self.client
+    #     count = self.count
 
-        if (channel == client.get_channel(802838284547784747)):
-            count += 1
-            await channel.send(count)
+    #     if (channel == client.get_channel(802838284547784747)):
+    #         count += 1
+    #         await channel.send(count)
 
     def get_count(self):
         return self.count
