@@ -30,12 +30,12 @@ class CommandClass(commands.Cog):
             await ctx.send("Invalid setup command...")
 
     @setup.command()
-    async def verify(self, ctx, channel: discord.TextChannel, reaction):
+    async def verify(self, ctx, channel: discord.TextChannel, reaction, role: discord.Role):
 
         with open("config.json", "w") as file:
-            data = {"verification_channel": channel.id, "verification_reaction": reaction}
+            data = {"verification_channel": channel.id, "verification_reaction": reaction, "role": role.id}
             file.write(json.dumps(data))
             
-        await ctx.send(f"Selected channel: <#{channel.id}>\nSelected emoji: {reaction}")
-        msg = await ctx.bot.get_channel(channel.id).send("Hello World!")
+        await ctx.send(f"Selected channel: <#{channel.id}>\nSelected emoji: {reaction}\nRole: {role.mention}")
+        msg = await ctx.bot.get_channel(channel.id).send("React to this message to get verified.")
         await msg.add_reaction(reaction)

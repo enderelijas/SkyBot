@@ -19,6 +19,22 @@ class Events(commands.Cog):
 
         await channel.send(embed=embed)
 
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        reaction = payload.emoji
+        user = payload.member
+        channel = payload.channel_id
+        guild = self.client.get_guild(payload.guild_id)
+
+        if (not user.bot):
+            with open("config.json", 'r') as file:
+                data = json.load(file)
+                verification_reaction = data['verification_reaction']
+                verification_channel = data['verification_channel']
+                role = guild.get_role(data['role'])
+            if ((verification_reaction == str(reaction)) and (verification_channel == channel)):
+                await user.add_roles(role)
+
     # @commands.Cog.listener()
     # async def on_message(self, message):
     #     channel = message.channel
@@ -28,7 +44,4 @@ class Events(commands.Cog):
     #     if (channel == client.get_channel(802838284547784747)):
     #         count += 1
     #         await channel.send(count)
-
-    def get_count(self):
-        return self.count
         
