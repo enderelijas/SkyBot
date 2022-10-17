@@ -1,4 +1,4 @@
-import aiohttp
+import aiohttp, json
 
 async def get_uuid(session, username):
     async with session.get(f"https://api.mojang.com/users/profiles/minecraft/{username}") as response:
@@ -16,3 +16,13 @@ async def check_verification(session, author, uuid, key):
                 return False
         else:
             return False
+
+async def set_config(*args):
+    with open("config.json", 'r') as file:
+        data = json.load(file)
+        for arg in args:
+            for key in arg:
+                data[key] = arg[key]
+    
+    with open("config.json", 'w') as file:
+        json.dump(data, file, indent=4)

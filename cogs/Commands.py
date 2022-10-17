@@ -1,6 +1,6 @@
 import discord, json
 from discord.ext import commands
-from methods import check_verification, get_uuid
+from methods import set_config
 
 class CommandClass(commands.Cog):
     def __init__(self, client):
@@ -30,12 +30,21 @@ class CommandClass(commands.Cog):
             await ctx.send("Invalid setup command...")
 
     @setup.command()
+    @commands.has_permissions(administrator = True)
     async def verify(self, ctx, channel: discord.TextChannel, reaction, role: discord.Role):
 
-        with open("config.json", "w") as file:
-            data = {"verification_channel": channel.id, "verification_reaction": reaction, "role": role.id}
-            file.write(json.dumps(data))
+        data = {"verification_channel": channel.id, "verification_reaction": reaction, "role": role.id}
+
+        await set_config(data)
             
         await ctx.send(f"Selected channel: <#{channel.id}>\nSelected emoji: {reaction}\nRole: {role.mention}")
         msg = await ctx.bot.get_channel(channel.id).send("React to this message to get verified.")
         await msg.add_reaction(reaction)
+
+    @setup.command()
+    @commands.has_permissions(administrator= True)
+    async def welcome(self, ctx, channel: discord.TextChannel):
+
+        await set_config({"welcome_channel": channel.id})
+      
+        await ctx.send(f"Selected channel: <#{channel.id}>")
