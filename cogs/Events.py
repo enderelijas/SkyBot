@@ -1,23 +1,27 @@
 import discord, json
 from discord.ext import commands
 from discord import Color
+from methods import add_user, get_level, gain_xp, get_xp, level_up, check_user
 
 class Events(commands.Cog):
     def __init__(self, client):
         self.client = client
-        self.count = self.client.count
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        # welcoming the user
         guild = member.guild
         channel = guild.get_channel(876855680496193556)
 
         embed = discord.Embed(title="Welcome to the server!", description=f"{member} has joined SkyEvents. Head over to #events to start participating.", color=Color.gold())
 
-        embed.set_thumbnail(url=guild.icon_url)
+        embed.set_thumbnail(url=guild.icon)
         embed.set_footer(text= "Made by enderelijas#5225")
 
         await channel.send(embed=embed)
+
+        # adding user record to database
+        await add_user(member)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -35,13 +39,17 @@ class Events(commands.Cog):
             if ((verification_reaction == str(reaction)) and (verification_channel == channel)):
                 await user.add_roles(role)
 
-    # @commands.Cog.listener()
-    # async def on_message(self, message):
-    #     channel = message.channel
-    #     client = self.client
-    #     count = self.count
-
-    #     if (channel == client.get_channel(802838284547784747)):
-    #         count += 1
-    #         await channel.send(count)
-        
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        user = message.author
+        channel = message.channel
+        if (not user.bot):
+            # making sure the user exists in the database, if not he gets added
+            if (await check_user(user.id)):
+                await gain_xp(user.id, 15)
+                await level_up(message)
+                
+            else:
+                await add_user(user)
+                await gain_xp(user.id, 15)
+            

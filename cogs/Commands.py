@@ -1,14 +1,13 @@
 import discord, json
 from discord.ext import commands
-from methods import set_config
+from methods import set_config, get_level
 
 class CommandClass(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.session = client.session
-        self.hypixel_key = client.hypixel_key
     
-    @commands.command()
+    @commands.hybrid_command(name="ping", description="Pings the bot")
     async def ping(self, ctx):
         await ctx.send("Pong!")
 
@@ -24,27 +23,13 @@ class CommandClass(commands.Cog):
     #     else:
     #         await ctx.send("Something went wrong. Please try again later.")
 
-    @commands.group()
-    async def setup(self, ctx):
-        if (ctx.invoked_subcommand is None):
-            await ctx.send("Invalid setup command...")
+    @commands.hybrid_command(name="level", description="Gets your level")
+    async def level(self, ctx):
+        user = ctx.message.author
+        level = (await get_level(user.id))
 
-    @setup.command()
-    @commands.has_permissions(administrator = True)
-    async def verify(self, ctx, channel: discord.TextChannel, reaction, role: discord.Role):
+        embed = discord.Embed(title=f'{user.name}\'s level', color=user.color)
+        embed.add_field(name="Level: ", value=level)
 
-        data = {"verification_channel": channel.id, "verification_reaction": reaction, "role": role.id}
-
-        await set_config(data)
-            
-        await ctx.send(f"Selected channel: <#{channel.id}>\nSelected emoji: {reaction}\nRole: {role.mention}")
-        msg = await ctx.bot.get_channel(channel.id).send("React to this message to get verified.")
-        await msg.add_reaction(reaction)
-
-    @setup.command()
-    @commands.has_permissions(administrator= True)
-    async def welcome(self, ctx, channel: discord.TextChannel):
-
-        await set_config({"welcome_channel": channel.id})
-      
-        await ctx.send(f"Selected channel: <#{channel.id}>")
+        embed.set_thumbnail(url = user.display_avatar)
+        await ctx.send(embed=embed)
